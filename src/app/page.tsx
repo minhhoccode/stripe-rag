@@ -28,18 +28,16 @@ export default async function Home() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+    <div className="min-h-screen bg-background">
       <Navbar />
       <Hero />
 
       {/* Features Section */}
-      <section className="py-24 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">
-              Powerful RAG Platform Features
-            </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+      <section className="section-spacing bg-card">
+        <div className="container-xl">
+          <div className="text-center">
+            <h2 className="section-title">Powerful RAG Platform Features</h2>
+            <p className="section-description">
               Our comprehensive platform enables organizations to create,
               customize, and manage AI-powered chatbots with advanced retrieval
               capabilities.
@@ -73,13 +71,10 @@ export default async function Home() {
                   "Comprehensive insights into chatbot performance and usage",
               },
             ].map((feature, index) => (
-              <div
-                key={index}
-                className="p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow"
-              >
-                <div className="text-blue-600 mb-4">{feature.icon}</div>
+              <div key={index} className="feature-card">
+                <div className="feature-icon mb-4">{feature.icon}</div>
                 <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                <p className="text-gray-600">{feature.description}</p>
+                <p className="text-muted-foreground">{feature.description}</p>
               </div>
             ))}
           </div>
@@ -87,11 +82,11 @@ export default async function Home() {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">How It Works</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+      <section className="section-spacing bg-secondary">
+        <div className="container-lg">
+          <div className="text-center">
+            <h2 className="section-title">How It Works</h2>
+            <p className="section-description">
               Our platform makes it easy to deploy powerful AI chatbots across
               your organization
             </p>
@@ -99,39 +94,39 @@ export default async function Home() {
 
           <div className="grid md:grid-cols-3 gap-12 max-w-5xl mx-auto">
             <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                <FileText className="w-8 h-8 text-blue-600" />
+              <div className="w-16 h-16 bg-[hsl(var(--primary-light))] rounded-full flex items-center justify-center mb-4">
+                <FileText className="w-8 h-8 feature-icon" />
               </div>
               <h3 className="text-xl font-semibold mb-2">
                 1. Connect Your Data
               </h3>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Upload documents, connect to URLs, or integrate with your
                 existing databases
               </p>
             </div>
 
             <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                <Settings className="w-8 h-8 text-blue-600" />
+              <div className="w-16 h-16 bg-[hsl(var(--primary-light))] rounded-full flex items-center justify-center mb-4">
+                <Settings className="w-8 h-8 feature-icon" />
               </div>
               <h3 className="text-xl font-semibold mb-2">
                 2. Configure Your Chatbot
               </h3>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Customize LLM parameters, set access permissions, and assign
                 data sources
               </p>
             </div>
 
             <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                <Globe className="w-8 h-8 text-blue-600" />
+              <div className="w-16 h-16 bg-[hsl(var(--primary-light))] rounded-full flex items-center justify-center mb-4">
+                <Globe className="w-8 h-8 feature-icon" />
               </div>
               <h3 className="text-xl font-semibold mb-2">
                 3. Deploy & Analyze
               </h3>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Launch your chatbot and gain insights through our comprehensive
                 analytics dashboard
               </p>
@@ -141,35 +136,35 @@ export default async function Home() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-20 bg-blue-600 text-white">
+      <section className="stats-section">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-4xl font-bold mb-2">99.9%</div>
-              <div className="text-blue-100">Uptime Guaranteed</div>
+              <div className="stats-value">99.9%</div>
+              <div className="stats-label">Uptime Guaranteed</div>
             </div>
             <div>
-              <div className="text-4xl font-bold mb-2">500+</div>
-              <div className="text-blue-100">Enterprise Clients</div>
+              <div className="stats-value">500+</div>
+              <div className="stats-label">Enterprise Clients</div>
             </div>
             <div>
-              <div className="text-4xl font-bold mb-2">10M+</div>
-              <div className="text-blue-100">Documents Processed</div>
+              <div className="stats-value">10M+</div>
+              <div className="stats-label">Documents Processed</div>
             </div>
             <div>
-              <div className="text-4xl font-bold mb-2">50+</div>
-              <div className="text-blue-100">Data Integrations</div>
+              <div className="stats-value">50+</div>
+              <div className="stats-label">Data Integrations</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Use Cases Section */}
-      <section className="py-24 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Powerful Use Cases</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+      <section className="section-spacing bg-card">
+        <div className="container-lg">
+          <div className="text-center">
+            <h2 className="section-title">Powerful Use Cases</h2>
+            <p className="section-description">
               Our platform adapts to various business needs across departments
             </p>
           </div>
@@ -213,13 +208,10 @@ export default async function Home() {
                 icon: <Globe className="w-6 h-6" />,
               },
             ].map((useCase, index) => (
-              <div
-                key={index}
-                className="p-6 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all"
-              >
-                <div className="text-blue-600 mb-4">{useCase.icon}</div>
+              <div key={index} className="use-case-card">
+                <div className="feature-icon mb-4">{useCase.icon}</div>
                 <h3 className="text-xl font-semibold mb-2">{useCase.title}</h3>
-                <p className="text-gray-600">{useCase.description}</p>
+                <p className="text-muted-foreground">{useCase.description}</p>
               </div>
             ))}
           </div>
@@ -227,13 +219,11 @@ export default async function Home() {
       </section>
 
       {/* Pricing Section */}
-      <section className="py-24 bg-gray-50" id="pricing">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">
-              Simple, Transparent Pricing
-            </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+      <section className="section-spacing bg-secondary" id="pricing">
+        <div className="container-lg">
+          <div className="text-center">
+            <h2 className="section-title">Simple, Transparent Pricing</h2>
+            <p className="section-description">
               Choose the perfect plan for your organization's needs. Scale as
               you grow.
             </p>
@@ -247,27 +237,21 @@ export default async function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-white border-t border-gray-100">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">
+      <section className="section-spacing bg-card border-t border-border">
+        <div className="container-lg text-center">
+          <h2 className="section-title">
             Ready to Transform Your Knowledge Management?
           </h2>
-          <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
+          <p className="section-description">
             Join leading organizations that use our platform to make their
             information accessible and actionable.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center px-6 py-3 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
-            >
+            <Link href="/dashboard" className="primary-button">
               Get Started Now
               <ArrowUpRight className="ml-2 w-4 h-4" />
             </Link>
-            <Link
-              href="#pricing"
-              className="inline-flex items-center px-6 py-3 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-            >
+            <Link href="#pricing" className="outline-button">
               View Pricing
             </Link>
           </div>
