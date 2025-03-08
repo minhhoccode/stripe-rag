@@ -1,21 +1,36 @@
-import { createClient } from "../../../supabase/server";
+"use client"
+
+import { useEffect, useState } from "react";
+import { createClient } from "../../../supabase/client";
 import { InfoIcon, UserCircle } from "lucide-react";
-import { redirect } from "next/navigation";
-import { SubscriptionCheck } from "@/components/subscription-check";
+import { useRouter } from "next/navigation";
+import { ClientSubscriptionCheck } from "@/components/client-subscription-check";
+import { PageHeader } from "@/components/page-header"
 
-export default async function Dashboard() {
-  const supabase = await createClient();
+export default function Dashboard() {
+  const router = useRouter();
+  const supabase = createClient();
+  const [user, setUser] = useState<any>(null);
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  useEffect(() => {
+    async function getUser() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        router.push("/sign-in");
+        return;
+      }
+      setUser(user);
+    }
+    getUser();
+  }, [router]);
 
   if (!user) {
-    return redirect("/sign-in");
+    return null;
   }
 
   return (
-    <SubscriptionCheck>
+    <ClientSubscriptionCheck>
+          <PageHeader title="dashboard" breadcrumbs={[{ title: "Report", href: "/" }, { title: "dashboard" }]} />
       <main>
         <div className="container mx-auto px-4 py-8 flex flex-col gap-8">
           {/* Header Section */}
@@ -44,6 +59,6 @@ export default async function Dashboard() {
           </section>
         </div>
       </main>
-    </SubscriptionCheck>
+    </ClientSubscriptionCheck>
   );
 }
