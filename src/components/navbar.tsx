@@ -7,7 +7,7 @@ import { Menu, MessageSquare, X } from "lucide-react"
 import { Button } from "./ui/button"
 import { ThemeToggle } from "./theme-toggle"
 import UserProfile from "./user-profile"
-import { cn } from "@/lib/utils"
+import { cn } from "@/components/lib/utils"
 
 export default function Navbar() {
   const [user, setUser] = useState<any>(null)

@@ -9,7 +9,8 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu'
 import { Button } from './ui/button'
-import { UserCircle, Home } from 'lucide-react'
+import { UserCircle } from 'lucide-react'
+import { ThemeToggle } from './theme-toggle'
 import { useRouter } from 'next/navigation'
 
 export default function DashboardNavbar() {
@@ -17,14 +18,15 @@ export default function DashboardNavbar() {
   const router = useRouter()
 
   return (
-    <nav className="w-full border-b border-gray-200 bg-white py-4">
+    <nav className="w-full border-b border-border bg-card py-4">
       <div className="container mx-auto px-4 flex justify-between items-center">
         <div className="flex items-center gap-4">
           <Link href="/" prefetch className="text-xl font-bold">
             Logo
           </Link>
         </div>
-        <div className="flex gap-4 items-center">
+        <div className="flex gap-2 items-center">
+          <ThemeToggle />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">

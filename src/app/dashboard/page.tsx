@@ -1,4 +1,3 @@
-import DashboardNavbar from "@/components/dashboard-navbar";
 import { createClient } from "../../../supabase/server";
 import { InfoIcon, UserCircle } from "lucide-react";
 import { redirect } from "next/navigation";
@@ -17,8 +16,7 @@ export default async function Dashboard() {
 
   return (
     <SubscriptionCheck>
-      <DashboardNavbar />
-      <main className="w-full">
+      <main>
         <div className="container mx-auto px-4 py-8 flex flex-col gap-8">
           {/* Header Section */}
           <header className="flex flex-col gap-4">
