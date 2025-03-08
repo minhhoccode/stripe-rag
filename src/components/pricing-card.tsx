@@ -52,20 +52,20 @@ export default function PricingCard({ item, user }: {
     };
 
     return (
-        <Card className={`w-[350px] relative overflow-hidden ${item.popular ? 'border-2 border-blue-500 shadow-xl scale-105' : 'border border-gray-200'}`}>
+        <Card className={`w-[350px] relative overflow-hidden ${item.popular ? 'border-2 border-[hsl(var(--primary))] shadow-xl scale-105' : 'border border-border'}`}>
             {item.popular && (
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50 opacity-30" />
+                <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--hero-gradient-from))] via-[hsl(var(--hero-gradient-via))] to-[hsl(var(--hero-gradient-to))] opacity-30" />
             )}
             <CardHeader className="relative">
                 {item.popular && (
-                    <div className="px-4 py-1.5 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-full w-fit mb-4">
+                    <div className="px-4 py-1.5 text-sm font-medium text-primary-foreground bg-[hsl(var(--primary))] rounded-full w-fit mb-4">
                         Most Popular
                     </div>
                 )}
-                <CardTitle className="text-2xl font-bold tracking-tight text-gray-900">{item.name}</CardTitle>
+                <CardTitle className="text-2xl font-bold tracking-tight">{item.name}</CardTitle>
                 <CardDescription className="flex items-baseline gap-2 mt-2">
-                    <span className="text-4xl font-bold text-gray-900">${item?.amount / 100}</span>
-                    <span className="text-gray-600">/{item?.interval}</span>
+                    <span className="text-4xl font-bold">${item?.amount / 100}</span>
+                    <span className="text-muted-foreground">/{item?.interval}</span>
                 </CardDescription>
             </CardHeader>
             <CardFooter className="relative">

@@ -169,7 +169,7 @@
   }
 
   .secondary-button {
-    @apply inline-flex items-center justify-center px-5 py-2.5 md:px-6 md:py-3 text-gray-700 bg-[hsl(var(--secondary))] rounded-lg hover:bg-[hsl(var(--secondary))/80] transition-colors font-medium;
+    @apply inline-flex items-center justify-center px-5 py-2.5 md:px-6 md:py-3 text-secondary-foreground bg-[hsl(var(--secondary))] rounded-lg hover:bg-[hsl(var(--secondary))/80] transition-colors font-medium;
   }
 
   .outline-button {
