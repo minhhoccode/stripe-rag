@@ -33,7 +33,7 @@ export function AppSidebar() {
   const pathname = usePathname()
   const router = useRouter() 
   const supabase = createClient()
-  const { toggleTheme } = useTheme()
+  const { theme, setTheme } = useTheme()
   const [user, setUser] = React.useState<any>(null)
 
   React.useEffect(() => {
@@ -188,7 +188,7 @@ export function AppSidebar() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => {
-                  toggleTheme()
+                  setTheme(theme === "light" ? "dark" : "light")
                 }}>
                   <span>Change Theme</span>
                 </DropdownMenuItem>

@@ -5,13 +5,13 @@ import { Button } from "./ui/button"
 import { useTheme } from "./theme-provider"
 
 export function ThemeToggle() {
-  const { theme, toggleTheme } = useTheme()
+  const { theme, setTheme } = useTheme()
 
   return (
     <Button
       variant="ghost"
       size="icon"
-      onClick={toggleTheme}
+      onClick={() => setTheme(theme === "light" ? "dark" : "light")}
       className="w-9 h-9"
     >
       {theme === "dark" ? (
