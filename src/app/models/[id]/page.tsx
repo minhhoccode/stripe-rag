@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Send, RotateCcw, Bot, ChevronRight, ChevronLeft, AlertCircle, Copy, Check, Loader2, Sparkles, Zap, Gauge, HelpCircle } from 'lucide-react';
+import { Send, RotateCcw, Bot, ChevronRight, ChevronLeft, AlertCircle, Loader2, Sparkles, Zap, Gauge, HelpCircle } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +27,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Message } from "@/components/message";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,9 +43,8 @@ const DEFAULT_SYSTEM_PROMPT = "You are a helpful AI assistant.";
 const DEFAULT_ASSISTANT_MESSAGE = "Hello! How can I help you today?";
 const DEFAULT_CONFIG = {
   temperature: 0.7,
-  stop: "Human:",
 };
-const API_URL = process.env.AIHUB_URL || "http://localhost:4000"; // Moved API URL to a constant
+const API_URL = process.env.AIHUB_URL || "http://localhost:4000";
 
 // Configuration presets
 const CONFIG_PRESETS = {
@@ -53,7 +53,7 @@ const CONFIG_PRESETS = {
     icon: <Gauge className="h-4 w-4 mr-2" />,
     config: {
       temperature: 0.7,
-      stop: "Human:",
+      
     },
     systemPrompt: "You are a helpful AI assistant.",
   },
@@ -62,7 +62,7 @@ const CONFIG_PRESETS = {
     icon: <Sparkles className="h-4 w-4 mr-2" />,
     config: {
       temperature: 0.9,
-      stop: "Human:",
+      
     },
     systemPrompt: "You are a creative AI assistant. Think outside the box and provide imaginative responses.",
   },
@@ -71,7 +71,7 @@ const CONFIG_PRESETS = {
     icon: <Zap className="h-4 w-4 mr-2" />,
     config: {
       temperature: 0.3,
-      stop: "Human:",
+      
     },
     systemPrompt: "You are a precise AI assistant. Provide accurate, factual, and concise responses.",
   },
@@ -84,71 +84,6 @@ const EXAMPLE_PROMPTS = [
   "What are the best practices for React development?",
   "Help me debug this error: TypeError: Cannot read property 'map' of undefined",
 ];
-
-interface MessageProps {
-  message: {
-    role: string;
-    content: string;
-  };
-  onCopy: () => void;
-}
-
-const Message = React.memo(({ message, onCopy }: MessageProps) => {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(message.content);
-    setCopied(true);
-    onCopy();
-    setTimeout(() => setCopied(false), 2000);
-  }, [message.content, onCopy]);
-
-  if (message.role === "system") return null;
-
-  return (
-    <div
-      className={`flex items-start gap-3 ${
-        message.role === "assistant" ? "" : "justify-end"
-      }`}
-    >
-      {message.role === "assistant" && (
-        <Avatar className="mt-0.5 h-9 w-9 border border-primary/10 shadow-sm">
-          <AvatarImage src="/placeholder.svg?height=36&width=36" alt="AI" />
-          <AvatarFallback className="bg-primary/5 text-primary">AI</AvatarFallback>
-        </Avatar>
-      )}
-      <div
-        className={`group relative rounded-lg p-4 shadow-sm max-w-[85%] ${
-          message.role === "assistant"
-            ? "bg-card border border-border/50"
-            : "bg-primary text-primary-foreground"
-        }`}
-      >
-        <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
-        
-        {message.role === "assistant" && (
-          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-7 w-7" 
-              onClick={handleCopy}
-              aria-label={copied ? "Copied" : "Copy message"}
-            >
-              {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-            </Button>
-          </div>
-        )}
-      </div>
-      {message.role === "user" && (
-        <Avatar className="mt-0.5 h-9 w-9 border border-primary/10 shadow-sm">
-          <AvatarImage src="/placeholder.svg?height=36&width=36" alt="User" />
-          <AvatarFallback>You</AvatarFallback>
-        </Avatar>
-      )}
-    </div>
-  );
-});
 
 interface ModelOption {
   value: string;
@@ -217,13 +152,13 @@ export default function PlaygroundPage({ params }: PlaygroundPageProps) {
     setCharCount(input.length);
   }, [input]);
 
-  // Fetch models (optimized with useCallback)
+  // Fetch models
   const fetchModels = useCallback(async (): Promise<void> => {
     try {
       const apiKey = process.env.NEXT_PUBLIC_API_KEY;
       const apiUrl = `${API_URL}/models?return_wildcard_routes=false`;
 
-        const response = await fetch(apiUrl, { 
+      const response = await fetch(apiUrl, { 
         method: "GET",
         headers: {
           accept: "application/json",
@@ -254,7 +189,7 @@ export default function PlaygroundPage({ params }: PlaygroundPageProps) {
     fetchModels();
   }, [fetchModels, params.id]);
 
-  // Handle config text change (optimized with useCallback)
+  // Handle config text change
   const handleConfigTextChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const text = e.target.value;
     setConfigText(text);
@@ -278,7 +213,7 @@ export default function PlaygroundPage({ params }: PlaygroundPageProps) {
     });
   }, [toast]);
 
-  // Handle sending messages (optimized with useCallback)
+  // Handle sending messages
   const handleSend = useCallback(async () => {
     if (!input.trim() || loading) return;
 
@@ -315,6 +250,7 @@ export default function PlaygroundPage({ params }: PlaygroundPageProps) {
       if (!response.body) {
         throw new Error('Response body is null');
       }
+
       const reader = response.body.getReader();
       const decoder = new TextDecoder("utf-8");
       let accumulatedResponse = "";
@@ -324,7 +260,6 @@ export default function PlaygroundPage({ params }: PlaygroundPageProps) {
         { role: "assistant", content: "" },
       ]);
 
-      // Simulate progress for better UX
       const progressInterval = setInterval(() => {
         setProgress((prev) => {
           const newProgress = prev + (100 - prev) * 0.1;
@@ -417,11 +352,10 @@ export default function PlaygroundPage({ params }: PlaygroundPageProps) {
   const handleUseExample = useCallback((example: string) => {
     setInput(example);
     setShowExamples(false);
-    // Focus the textarea
     document.querySelector('textarea')?.focus();
   }, []);
 
-  // Scroll to bottom (optimized with useMemo and useEffect)
+  // Scroll to bottom
   const messagesLength = useMemo(() => messages.length, [messages]);
 
   useEffect(() => {
@@ -433,7 +367,7 @@ export default function PlaygroundPage({ params }: PlaygroundPageProps) {
     }
   }, [messagesLength]);
 
-  // Optimized input handling
+  // Input handling
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);
     setCharCount(e.target.value.length);
@@ -449,7 +383,6 @@ export default function PlaygroundPage({ params }: PlaygroundPageProps) {
     [handleSend]
   );
 
-  // Estimate tokens (very rough approximation)
   const estimatedTokens = useMemo(() => {
     return Math.ceil(charCount / 4);
   }, [charCount]);

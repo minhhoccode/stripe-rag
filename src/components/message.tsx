@@ -35,11 +35,11 @@ export const Message = React.memo(({ message, onCopy }: MessageProps) => {
         </Avatar>
       )}
       <div
-        className={`group relative rounded-lg p-4 shadow-sm max-w-[85%] ${
+        className={`group relative rounded-lg px-3 shadow-sm max-w-[85%] ${
           message.role === "assistant" ? "bg-card border border-border/50" : "bg-primary text-primary-foreground"
         }`}
       >
-        <div className="text-sm leading-relaxed whitespace-pre-wrap">
+        <div className="text-sm leading-relaxed">
           <MarkdownRenderer content={message.content} className={message.role === "user" ? "prose-invert" : ""} />
         </div>
 
