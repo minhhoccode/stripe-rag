@@ -1,4 +1,4 @@
--- Combined migration file that includes all necessary database setup
+`-- Combined migration file that includes all necessary database setup
 
 -- Users table
 CREATE TABLE IF NOT EXISTS public.users (
@@ -162,4 +162,4 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 DROP TRIGGER IF EXISTS on_auth_user_updated ON auth.users;
 CREATE TRIGGER on_auth_user_updated
   AFTER UPDATE ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.handle_user_update(); 
+  FOR EACH ROW EXECUTE FUNCTION public.handle_user_update(); `
