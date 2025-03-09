@@ -2,9 +2,22 @@
 
 import type React from "react";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { SidebarInset } from "@/components/ui/sidebar";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Plus, Search, MoreHorizontal, Loader2, DollarSign } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   Dialog,
   DialogContent,
@@ -13,9 +26,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import ModelCard from "@/components/ModelCard";
 import HealthCheckDialog from "@/components/HealthCheckDialog";
 import ModelSearchFilter from "@/components/ModelSearchFilter";
 import type { Model, ModelCostDetails } from "@/types/model";
@@ -45,6 +55,7 @@ interface EndpointHealth {
 }
 
 export default function ModelsPage() {
+  const router = useRouter();
   const [models, setModels] = useState<Model[]>([]);
   const [filteredModels, setFilteredModels] = useState<Model[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -59,53 +70,47 @@ export default function ModelsPage() {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-
+        
         // Fetch models
-        const modelsResponse = await fetch(
-          `${process.env.NEXT_PUBLIC_AIHUB_URL || "http://localhost:4000"}/models`,
-          {
-            headers: {
-              accept: "application/json",
-              "x-goog-api-key": process.env.NEXT_PUBLIC_API_KEY || "sk-1234",
-            },
+        const modelsResponse = await fetch(`${process.env.NEXT_PUBLIC_AIHUB_URL || 'http://localhost:4000'}/models`, {
+          headers: {
+            'accept': 'application/json',
+            'x-goog-api-key': process.env.NEXT_PUBLIC_API_KEY || 'sk-1234'
           }
-        );
-
+        });
+        
         if (!modelsResponse.ok) {
-          throw new Error("Failed to fetch models");
+          throw new Error('Failed to fetch models');
         }
-
+        
         const modelsData = await modelsResponse.json();
-
+        
         // Fetch cost map
-        const costResponse = await fetch(
-          `${process.env.NEXT_PUBLIC_AIHUB_URL || "http://localhost:4000"}/get/litellm_model_cost_map`,
-          {
-            headers: {
-              accept: "application/json",
-              "x-goog-api-key": process.env.NEXT_PUBLIC_API_KEY || "sk-1234",
-            },
+        const costResponse = await fetch(`${process.env.NEXT_PUBLIC_AIHUB_URL || 'http://localhost:4000'}/get/litellm_model_cost_map`, {
+          headers: {
+            'accept': 'application/json',
+            'x-goog-api-key': process.env.NEXT_PUBLIC_API_KEY || 'sk-1234'
           }
-        );
-
+        });
+        
         if (!costResponse.ok) {
-          throw new Error("Failed to fetch cost data");
+          throw new Error('Failed to fetch cost data');
         }
-
+        
         const costData = await costResponse.json();
         setCostMap(costData);
-
+        
         // Merge model data with cost data
         const modelsWithCost = modelsData.data.map((model: Model) => ({
           ...model,
-          costDetails: costData[model.id] || {},
+          costDetails: costData[model.id] || {}
         }));
-
+        
         setModels(modelsWithCost);
         setFilteredModels(modelsWithCost);
       } catch (error) {
-        console.error("Error fetching data:", error);
-        setError("Failed to load data. Please try again later.");
+        console.error('Error fetching data:', error);
+        setError('Failed to load data. Please try again later.');
       } finally {
         setIsLoading(false);
       }
@@ -116,7 +121,7 @@ export default function ModelsPage() {
 
   useEffect(() => {
     if (searchTerm) {
-      const filtered = models.filter((model) =>
+      const filtered = models.filter(model => 
         model.id.toLowerCase().includes(searchTerm.toLowerCase())
       );
       setFilteredModels(filtered);
@@ -133,30 +138,28 @@ export default function ModelsPage() {
   const getProviderFromModel = (model: Model) => {
     if (model.costDetails?.litellm_provider) {
       // Capitalize first letter
-      return (
-        model.costDetails.litellm_provider.charAt(0).toUpperCase() +
-        model.costDetails.litellm_provider.slice(1)
-      );
+      return model.costDetails.litellm_provider.charAt(0).toUpperCase() + 
+        model.costDetails.litellm_provider.slice(1);
     }
-
+    
     const id = model.id;
-    if (id.includes("gpt") || id.includes("davinci")) return "OpenAI";
-    if (id.includes("claude")) return "Anthropic";
-    if (id.includes("gemini")) return "Google";
-    if (id.includes("llama")) return "Meta";
-    if (id.includes("qwen")) return "Alibaba";
-    if (id.includes("deepseek")) return "DeepSeek AI";
-    if (id.includes("multilingual-e5")) return "Microsoft";
-    return "Other";
+    if (id.includes('gpt') || id.includes('davinci')) return 'OpenAI';
+    if (id.includes('claude')) return 'Anthropic';
+    if (id.includes('gemini')) return 'Google';
+    if (id.includes('llama')) return 'Meta';
+    if (id.includes('qwen')) return 'Alibaba';
+    if (id.includes('deepseek')) return 'DeepSeek AI';
+    if (id.includes('multilingual-e5')) return 'Microsoft';
+    return 'Other';
   };
 
   // Function to format timestamp to readable date
   const formatDate = (timestamp: number) => {
     const date = new Date(timestamp * 1000);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
     });
   };
 
@@ -164,7 +167,7 @@ export default function ModelsPage() {
   const formatCost = (cost?: number) => {
     if (cost === undefined || cost === null) return "N/A";
     if (cost === 0) return "Free";
-
+    
     return `$${(cost * 1000000).toFixed(2)}`;
   };
 
@@ -201,10 +204,7 @@ export default function ModelsPage() {
 
   return (
     <SidebarInset>
-      <PageHeader
-        title="Models"
-        breadcrumbs={[{ title: "Platform", href: "/" }, { title: "Models" }]}
-      />
+      <PageHeader title="Models" breadcrumbs={[{ title: "Platform", href: "/" }, { title: "Models" }]} />
       <main className="flex-1 p-6">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold">LLM Models</h1>
@@ -223,7 +223,8 @@ export default function ModelsPage() {
         <ModelSearchFilter searchTerm={searchTerm} handleSearch={handleSearch} />
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
-            Loading models...
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <span className="ml-2">Loading models...</span>
           </div>
         ) : error ? (
           <div className="flex justify-center items-center h-64">
@@ -231,24 +232,108 @@ export default function ModelsPage() {
           </div>
         ) : filteredModels.length === 0 ? (
           <div className="flex justify-center items-center h-64">
-            <p className="text-muted-foreground">
-              No models found matching your search.
-            </p>
+            <p className="text-muted-foreground">No models found matching your search.</p>
           </div>
         ) : (
           <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {filteredModels.map((model) => (
-              <ModelCard
-                key={model.id}
-                model={model}
-                getProviderFromModel={getProviderFromModel}
-                formatDate={formatDate}
-                formatCost={formatCost}
-              />
+              <Card key={model.id} className="flex flex-col justify-between h-full">
+                <div>
+                  <CardHeader className="flex flex-col items-start space-y-1">
+                    <CardTitle className="text-lg font-semibold">{model.id}</CardTitle>
+                    <CardDescription className="text-sm text-muted-foreground">
+                      {getProviderFromModel(model)}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-4">
+                    <div className="grid gap-3 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Added:</span>
+                        <span className="font-medium">{formatDate(model.created)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Type:</span>
+                        <span className="font-medium">{model.object}</span>
+                      </div>
+                      {model.costDetails?.max_tokens && (
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Max Tokens Output:</span>
+                          <span>{model.costDetails.max_tokens.toLocaleString()}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between items-center">
+                        <span className="text-muted-foreground">Input Price /1M Tokens:</span>
+                        <div className="flex items-center">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <span className="font-medium text-green-600">
+                                  {formatCost(model.costDetails?.input_cost_per_token)}
+                                </span>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Input Price /1M Tokens: {formatCost(model.costDetails?.input_cost_per_token)}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-muted-foreground">Output Price /1M Tokens:</span>
+                        <div className="flex items-center">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <span className="font-medium text-green-600">
+                                  {formatCost(model.costDetails?.output_cost_per_token)}
+                                </span>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Output Price /1M Tokens: {formatCost(model.costDetails?.output_cost_per_token)}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {model.costDetails && (
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {model.costDetails.supports_vision && (
+                          <Badge variant="secondary">Vision</Badge>
+                        )}
+                        {model.costDetails.supports_function_calling && (
+                          <Badge variant="secondary">Function Calling</Badge>
+                        )}
+                        {model.costDetails.supports_audio_input && (
+                          <Badge variant="secondary">Audio Input</Badge>
+                        )}
+                        {model.costDetails.supports_audio_output && (
+                          <Badge variant="secondary">Audio Output</Badge>
+                        )}
+                        {model.costDetails.mode && (
+                          <Badge variant="secondary">{model.costDetails.mode}</Badge>
+                        )}
+                      </div>
+                    )}
+                  </CardContent>
+                </div>
+                <CardFooter className="flex justify-between p-4">
+                  <Button variant="outline" size="sm">
+                    Configure
+                  </Button>
+                  <Button 
+                    size="sm"
+                    onClick={() => router.push(`/models/${model.id}`)}
+                  >
+                    Test Model
+                  </Button>
+                </CardFooter>
+              </Card>
             ))}
           </div>
         )}
       </main>
     </SidebarInset>
-  );
+  )
 }

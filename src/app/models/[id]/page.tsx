@@ -85,7 +85,15 @@ const EXAMPLE_PROMPTS = [
   "Help me debug this error: TypeError: Cannot read property 'map' of undefined",
 ];
 
-const Message = React.memo(({ message, onCopy }) => {
+interface MessageProps {
+  message: {
+    role: string;
+    content: string;
+  };
+  onCopy: () => void;
+}
+
+const Message = React.memo(({ message, onCopy }: MessageProps) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = useCallback(() => {
@@ -142,13 +150,41 @@ const Message = React.memo(({ message, onCopy }) => {
   );
 });
 
-export default function PlaygroundPage() {
+interface ModelOption {
+  value: string;
+  label: string;
+}
+
+interface PageHeaderProps {
+  title: string;
+  description?: string;
+  breadcrumbs: { title: string; href: string; }[];
+}
+
+interface ScrollAreaRef {
+  scrollTo: (options: { top: number; behavior: ScrollBehavior }) => void;
+  scrollHeight: number;
+}
+
+type PresetKey = keyof typeof CONFIG_PRESETS;
+
+interface ApiError extends Error {
+  message: string;
+}
+
+interface PlaygroundPageProps {
+  params: {
+    id: string;
+  };
+}
+
+export default function PlaygroundPage({ params }: PlaygroundPageProps) {
   const [messages, setMessages] = useState([
     { role: "system", content: DEFAULT_SYSTEM_PROMPT },
     { role: "assistant", content: DEFAULT_ASSISTANT_MESSAGE },
   ]);
   const [input, setInput] = useState("");
-  const [model, setModel] = useState("llama-3.3");
+  const [model, setModel] = useState(params.id);
   const [config, setConfig] = useState(DEFAULT_CONFIG);
   const [configText, setConfigText] = useState(JSON.stringify(DEFAULT_CONFIG, null, 2));
   const [jsonError, setJsonError] = useState("");
@@ -158,9 +194,9 @@ export default function PlaygroundPage() {
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [charCount, setCharCount] = useState(0);
-  const [selectedPreset, setSelectedPreset] = useState("balanced");
+  const [selectedPreset, setSelectedPreset] = useState<PresetKey>("balanced");
   const [showExamples, setShowExamples] = useState(false);
-  const scrollAreaRef = useRef(null);
+  const scrollAreaRef = useRef<ScrollAreaRef>(null);
   const { toast } = useToast();
   const isMobile = useMediaQuery("(max-width: 768px)");
 
@@ -182,12 +218,12 @@ export default function PlaygroundPage() {
   }, [input]);
 
   // Fetch models (optimized with useCallback)
-  const fetchModels = useCallback(async () => {
+  const fetchModels = useCallback(async (): Promise<void> => {
     try {
       const apiKey = process.env.NEXT_PUBLIC_API_KEY;
       const apiUrl = `${API_URL}/models?return_wildcard_routes=false`;
 
-      const response = await fetch(apiUrl, {
+        const response = await fetch(apiUrl, { 
         method: "GET",
         headers: {
           accept: "application/json",
@@ -201,7 +237,7 @@ export default function PlaygroundPage() {
 
       const data = await response.json();
       setAvailableModels(
-        data.data.map((model) => ({ value: model.id, label: model.id }))
+        data.data.map((model: { id: string }) => ({ value: model.id, label: model.id }))
       );
     } catch (error) {
       console.error("Error fetching models:", error);
@@ -214,11 +250,12 @@ export default function PlaygroundPage() {
   }, [toast]);
 
   useEffect(() => {
+    setModel(params.id);
     fetchModels();
-  }, [fetchModels]);
+  }, [fetchModels, params.id]);
 
   // Handle config text change (optimized with useCallback)
-  const handleConfigTextChange = useCallback((e) => {
+  const handleConfigTextChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const text = e.target.value;
     setConfigText(text);
     try {
@@ -230,7 +267,7 @@ export default function PlaygroundPage() {
   }, []);
 
   // Apply preset configuration
-  const applyPreset = useCallback((presetKey) => {
+  const applyPreset = useCallback((presetKey: keyof typeof CONFIG_PRESETS) => {
     const preset = CONFIG_PRESETS[presetKey];
     setConfig(preset.config);
     setSystemPrompt(preset.systemPrompt);
@@ -275,6 +312,9 @@ export default function PlaygroundPage() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
+      if (!response.body) {
+        throw new Error('Response body is null');
+      }
       const reader = response.body.getReader();
       const decoder = new TextDecoder("utf-8");
       let accumulatedResponse = "";
@@ -329,15 +369,16 @@ export default function PlaygroundPage() {
           }
         }
       }
-    } catch (error) {
-      console.error("Error sending message:", error);
+    } catch (err: unknown) {
+      console.error("Error sending message:", err);
+      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: `Error: ${error.message}` },
+        { role: "assistant", content: `Error: ${errorMessage}` },
       ]);
       toast({
         title: "Error sending message",
-        description: error.message,
+        description: err instanceof Error ? err.message : 'An unknown error occurred',
         variant: "destructive",
       });
     } finally {
@@ -373,7 +414,7 @@ export default function PlaygroundPage() {
     // This is handled in the Message component
   }, []);
 
-  const handleUseExample = useCallback((example) => {
+  const handleUseExample = useCallback((example: string) => {
     setInput(example);
     setShowExamples(false);
     // Focus the textarea
@@ -393,13 +434,13 @@ export default function PlaygroundPage() {
   }, [messagesLength]);
 
   // Optimized input handling
-  const handleInputChange = useCallback((e) => {
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);
     setCharCount(e.target.value.length);
   }, []);
 
   const handleKeyDown = useCallback(
-    (e) => {
+    (e: React.KeyboardEvent) => {
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
         handleSend();
@@ -418,10 +459,10 @@ export default function PlaygroundPage() {
       <div className="border-b">
         <PageHeader
           title="Playground"
-          description="Test and experiment with AI models in an interactive environment"
           breadcrumbs={[
             { title: "Platform", href: "/" },
-            { title: "Playground" },
+            { title: "models",  href: "/models"  },
+            { title: "LLM Playground", href: "/" },
           ]}
         />
       </div>
@@ -456,7 +497,7 @@ export default function PlaygroundPage() {
               <div className="flex items-center gap-2 rounded-full border bg-background px-3 py-1">
                 <Bot className="h-4 w-4 text-primary" />
                 <span className="text-sm font-medium">
-                  {availableModels.find((m) => m.value === model)?.label || model}
+                  {decodeURIComponent(model)}
                 </span>
               </div>
 
@@ -482,7 +523,7 @@ export default function PlaygroundPage() {
           )}
 
           <ScrollArea 
-            ref={scrollAreaRef} 
+            ref={scrollAreaRef as any}
             className="flex-1 px-4 py-6"
             aria-label="Chat messages"
             role="log"
@@ -623,13 +664,12 @@ export default function PlaygroundPage() {
                       <Select 
                         value={model} 
                         onValueChange={setModel}
-                        id="model-select"
                       >
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select model" />
                         </SelectTrigger>
                         <SelectContent>
-                          {availableModels.map((option) => (
+                          {availableModels.map((option: ModelOption) => (
                             <SelectItem key={option.value} value={option.value}>
                               {option.label}
                             </SelectItem>
@@ -680,7 +720,7 @@ export default function PlaygroundPage() {
                             key={key}
                             variant={selectedPreset === key ? "default" : "outline"}
                             className="justify-start"
-                            onClick={() => applyPreset(key)}
+                            onClick={() => applyPreset(key as PresetKey)}
                           >
                             {preset.icon}
                             <span className="truncate">{preset.name}</span>
